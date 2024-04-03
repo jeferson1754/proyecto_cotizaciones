@@ -9,14 +9,10 @@ for ($i = 0; $i < count($idRegistros); $i++) {
     $update = "UPDATE titulos 
                SET Nombre = '" . $nombre[$i] . "', Valor = '" . $valor[$i] . "'
                WHERE ID = '" . $idRegistros[$i] . "'";
-    
+
     $result_update = mysqli_query($conexion, $update);
-    
+
     echo $update . "<br>";
 }
 
-
-echo "<script type='text/javascript'>
-        window.location='index.php';
-    </script>";
-
+header("location:index.php");

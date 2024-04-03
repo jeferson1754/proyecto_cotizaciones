@@ -11,10 +11,5 @@ $result_update = mysqli_query($conexion, $update);
 
 echo $update;
 
-
-
-
-echo "<script type='text/javascript'>
-        window.location='index.php';
-    </script>";
+header("location:index.php");
 ?>

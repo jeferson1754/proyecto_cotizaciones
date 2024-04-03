@@ -42,7 +42,7 @@ $fecha_actual = date('Y-m-d');
 </style>
 
 <body>
-    <div class="col-sm">
+    <div class="col-sm text-center">
         <!--- Formulario para registrar Cliente --->
 
         <button type="button" class="btn btn-info " data-toggle="modal" data-target="#Crear">
@@ -53,12 +53,13 @@ $fecha_actual = date('Y-m-d');
         <button type="button" class="btn btn-info " data-toggle="modal" data-target="#Titulos">
             Cambiar Titulos
         </button>
-        <a href="pdf.php" class="btn btn-primary"><b>PDF</b> </a>
-        <?php include('ModalUpdate.php');  ?>
-        <?php include('ModalCrear.php');  ?>
-
+        <a href="factura.php" class="btn btn-primary"><b>PDF</b> </a>
     </div>
     <?php
+
+    include('ModalUpdate.php');
+    include('ModalCrear.php');
+
     $sql = "SELECT Nombre, FORMAT (Valor, 0, 'de_DE') from titulos where ID=1;";
     $result = mysqli_query($conexion, $sql);
     //echo $sql;
@@ -83,7 +84,6 @@ $fecha_actual = date('Y-m-d');
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Nombre</th>
                     <th>Valor</th>
                     <th>Fecha de Compra</th>
@@ -98,7 +98,6 @@ $fecha_actual = date('Y-m-d');
             while ($mostrar = mysqli_fetch_array($result)) {
             ?>
                 <tr>
-                    <td><?php echo $mostrar['ID'] ?></td>
                     <td><?php echo $mostrar['Nombre'] ?></td>
                     <td><?php echo $mostrar['Valor'] ?></td>
                     <td><?php echo $mostrar['Fecha'] ?></td>
@@ -161,9 +160,13 @@ $fecha_actual = date('Y-m-d');
     <?php
     }
     ?>
-    <button type="button" class="btn btn-info " data-toggle="modal" data-target="#CrearA">
-        Nuevo Anticipo
-    </button>
+    <br>
+    <div class="text-center">
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#CrearA">
+            Nuevo Anticipo
+        </button>
+    </div>
+
     <?php include('ModalCrear copy.php');  ?>
     <div class="main-container div1">
 
