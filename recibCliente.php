@@ -2,22 +2,23 @@
 include('bd.php');
 $nombre     = $_REQUEST['nombre'];
 $valor      = $_REQUEST['valor'];
-$fecha      = $_REQUEST['fecha'];
+$cantidad   = $_REQUEST['cantidad'];
+
+$total = $valor * $cantidad;
 
 try {
     $conn = new PDO("mysql:host=$servidor;dbname=$basededatos", $usuario, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $sql2 = "INSERT INTO `cotizar`( `Nombre`, `Valor`, `Fecha`)
+    $sql2 = "INSERT INTO `cotizar`( `Nombre`, `Valor Unitario`, `Cantidad`,`Total`)
     VALUES (
     '" . $nombre . "',
     '" . $valor . "',
-    '" . $fecha . "')";
+    '" . $cantidad . "',
+    '" . $total . "')";
 
     $conn->exec($sql2);
 
     echo $sql2;
-    //echo 'ultimo usuario insertado ' . $last_id1;
-    //echo 'ultimo usuario insertado ' . $last_id2;
     echo "<br>";
 } catch (PDOException $e) {
     echo $sql2;

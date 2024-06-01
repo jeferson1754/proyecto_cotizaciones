@@ -19,17 +19,21 @@
 
           <div class="form-group">
             <label for="recipient-name" class="col-form-label">Nombre:</label>
-            <input type="text" name="Nombre" class="form-control" value="<?php echo $mostrar['Nombre']; ?>" required="true">
+            <input type="text" name="nombre" class="form-control" value="<?php echo $mostrar['Nombre']; ?>" required="true">
           </div>
 
           <div class="form-group">
             <label for="ubi" class="form-label">Valor:</label>
-            <input type="number" class="form-control" min="0" name="valor" value="<?php echo $mostrar['Valor']; ?>">
+            <input type="number" class="form-control" min="0" name="valor" step="100" value="<?php echo $mostrar['Valor Unitario']; ?>">
           </div>
 
           <div class="form-group">
-            <label for="fecha" class="form-label">Fecha de Compra:</label>
-            <input type="date" class="form-control" name="fecha" value="<?php echo $mostrar['Fecha']; ?>">
+            <label for="ubi" class="form-label">Cantidad:</label>
+            <input type="number" class="form-control" min="0" name="cantidad" value="<?php echo $mostrar['Cantidad']; ?>">
+          </div>
+          <div class="form-group">
+            <label for="ubi" class="form-label">Total:</label>
+            <input type="number" class="form-control" name="total" disabled="true" value="<?php echo $mostrar['Total']; ?>">
           </div>
         </div>
         <div class="modal-footer">

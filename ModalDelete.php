@@ -10,11 +10,6 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <style>
-        .div1 {
-          text-align: center;
-        }
-      </style>
 
 
       <form method="POST" action="recib_Delete.php">
@@ -27,7 +22,7 @@
             <?php echo $mostrar['Nombre']; ?>
           </h1>
           <h2 class="modal-title">
-            <?php echo $mostrar['Valor']; ?>
+            Total:<?php echo '$' . number_format($mostrar['Total'], 0, ',', '.'); ?>
           </h2>
         </div>
         <div class="modal-footer">
