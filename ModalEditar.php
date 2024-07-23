@@ -24,7 +24,7 @@
 
           <div class="form-group">
             <label for="ubi" class="form-label">Valor:</label>
-            <input type="number" class="form-control" min="0" name="valor" step="100" value="<?php echo $mostrar['Valor Unitario']; ?>">
+            <input type="number" class="form-control" min="0" name="valor" value="<?php echo $mostrar['Valor Unitario']; ?>">
           </div>
 
           <div class="form-group">
