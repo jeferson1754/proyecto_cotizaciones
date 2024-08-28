@@ -87,7 +87,10 @@ $fecha_actual = date('Y-m-d');
             Nuevo Materiales
         </button>
 
-        <a href="factura.php" target="_blank" class="btn btn-danger"><b>PDF</b> </a>
+        <a href="factura.php" target="_blank" class="btn btn-danger ocultar"><b>PDF</b> </a>
+
+        <a href="base_pdf.php" target="_blank" class="btn btn-danger mostrar"><b>PDF</b> </a>
+
     </div>
     <?php
     include('ModalCrear.php');
@@ -95,11 +98,13 @@ $fecha_actual = date('Y-m-d');
     include('ModalCrear-Varios.php');
     ?>
 
-    <div class="main-container">
-        <?php
-        $sql = "SELECT * FROM `cotizar`;";
-        $result = mysqli_query($conexion, $sql);
-        //echo $sql;
+<div class="main-container">
+    <?php
+    $sql = "SELECT * FROM `cotizar`;";
+    $result = mysqli_query($conexion, $sql);
+
+    // Verificar si hay registros
+    if (mysqli_num_rows($result) > 0) {
         echo "<table>
             <thead>
                 <tr>
@@ -112,7 +117,7 @@ $fecha_actual = date('Y-m-d');
             </thead>";
 
         while ($mostrar = mysqli_fetch_array($result)) {
-        ?>
+            ?>
             <tr>
                 <td class="nombre"><?php echo $mostrar['Nombre'] ?></td>
                 <td><?php echo '$' . number_format($mostrar['Valor Unitario'], 0, ',', '.'); ?></td>
@@ -133,30 +138,29 @@ $fecha_actual = date('Y-m-d');
 
             <!--Ventana Modal para la Alerta de Eliminar--->
             <?php include('ModalDelete.php'); ?>
-        <?php
+            <?php
         }
-        echo "<table>";
-        ?>
+        echo "</table>";
 
-        <?php
-        $sql = "SELECT FORMAT(SUM(Total),0,'de_DE') FROM cotizar;";
-        $result = mysqli_query($conexion, $sql);
-        //echo $sql;
+        // Mostrar la suma total
+        $sql_sum = "SELECT FORMAT(SUM(Total),0,'de_DE') FROM cotizar;";
+        $result_sum = mysqli_query($conexion, $sql_sum);
 
-        while ($mostrar = mysqli_fetch_array($result)) {
-        ?>
-            <br>
-            <br>
+        while ($mostrar_sum = mysqli_fetch_array($result_sum)) {
+            ?>
+            <br><br>
             <div class="div1">
-                <h2><?php echo "Suma Total:" . $mostrar[0] ?> </h2>
+                <h2><?php echo "Suma Total: $" . $mostrar_sum[0] ?> </h2>
             </div>
-
-
-
-        <?php
+            <?php
         }
-        ?>
-    </div>
+    } else {
+        // Si no hay registros, mostrar "Sin registros"
+        echo " <div class='div1'><h2>Sin registros</h2></div>";
+    }
+    ?>
+</div>
+
 
     <br>
 

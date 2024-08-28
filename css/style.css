@@ -132,6 +132,10 @@ tr:hover td {
 }
 
 
+.mostrar {
+    display: none !important;
+}
+
 
 @media screen and (max-width: 600px) {
     table {
@@ -188,5 +192,13 @@ tr:hover td {
         /* Elimina el margen derecho en vistas móviles */
         margin-bottom: 5px;
         /* Añade un margen inferior para separar los elementos verticalmente */
+    }
+
+    .ocultar {
+        display: none !important;
+    }
+
+    .mostrar {
+        display: inline-block !important;
     }
 }
