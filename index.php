@@ -5,30 +5,333 @@ date_default_timezone_set('America/Santiago');
 $fecha_actual = date('Y-m-d');
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Cotizaciones</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <!-- SweetAlert2 -->
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" type="text/css" href="./css/style.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" type="text/css" href="./css/bootstrap.css?v=<?php echo time(); ?>">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --warning-color: #f9c74f;
+            --danger-color: #e63946;
+            --success-color: #2a9d8f;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
 
+        body {
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: white;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
+            border: none;
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+        }
+
+        .action-buttons {
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-custom-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-custom-primary:hover {
+            background-color: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-custom-warning {
+            background-color: var(--warning-color);
+            color: var(--dark-color);
+            border: none;
+        }
+
+        .btn-custom-warning:hover {
+            background-color: #e9b949;
+            transform: translateY(-2px);
+        }
+
+        .btn-custom-danger {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-custom-danger:hover {
+            background-color: #d62828;
+            transform: translateY(-2px);
+        }
+
+        .table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .table thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .table th {
+            font-weight: 600;
+            padding: 1rem;
+        }
+
+        .table td {
+            padding: 0.75rem 1rem;
+            vertical-align: middle;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .total-summary {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
+            margin-top: 1.5rem;
+        }
+
+        .total-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .material-input {
+            display: grid;
+            grid-template-columns: 3fr 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        @media (max-width: 992px) {
+            .material-input {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-calculator me-2"></i>Sistema de Cotizaciones
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Action Buttons -->
+        <div class="card action-buttons">
+            <div class="card-body d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-custom-warning" data-bs-toggle="modal" data-bs-target="#Nueva_Cotizacion">
+                    <i class="fas fa-plus-circle me-1"></i> Nueva Cotización
+                </button>
+                <button type="button" class="btn btn-custom-primary" data-bs-toggle="modal" data-bs-target="#Crear">
+                    <i class="fas fa-cube me-1"></i> Nuevo Material
+                </button>
+                <button type="button" class="btn btn-custom-primary" data-bs-toggle="modal" data-bs-target="#Crear2">
+                    <i class="fas fa-cubes me-1"></i> Nuevos Materiales
+                </button>
+                <a href="base_pdf.php" target="_blank" class="btn btn-custom-danger mostrar">
+                    <i class="fas fa-file-pdf me-1"></i> Visualizar Cotizacion
+                </a>
+                <a href="factura.php" target="_blank" class="btn btn-custom-danger ocultar">
+                    <i class="fas fa-file-pdf me-1"></i> PDF
+                </a>
+
+            </div>
+        </div>
+
+        <!-- Materials Table -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Lista de Materiales</h5>
+                <div class="input-group" style="max-width: 300px;">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Buscar material...">
+                    <button class="btn btn-custom-primary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <?php
+                $sql = "SELECT * FROM `cotizar`;";
+                $result = mysqli_query($conexion, $sql);
+
+                // Verificar si hay registros
+                if (mysqli_num_rows($result) > 0) {
+                ?>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Valor Unitario</th>
+                                    <th>Cantidad</th>
+                                    <th>Total</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                function formatCurrency($value)
+                                {
+                                    return '$' . number_format($value, 0, ',', '.');
+                                }
+
+                                while ($mostrar = mysqli_fetch_array($result)) {
+                                ?>
+                                    <tr>
+                                        <td class="nombre"><?php echo $mostrar['Nombre'] ?></td>
+                                        <td><?= formatCurrency($mostrar['Valor Unitario']) ?></td>
+                                        <td><?= htmlspecialchars($mostrar['Cantidad']) ?></td>
+                                        <td><?= formatCurrency($mostrar['Total']) ?></td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editChildresn<?php echo $mostrar['ID']; ?>">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#editChildresn1<?php echo $mostrar['ID']; ?>">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <?php
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <?php
+                    // Mostrar la suma total
+                    $sql_sum = "SELECT FORMAT(SUM(Total),0,'de_DE') FROM cotizar;";
+                    $result_sum = mysqli_query($conexion, $sql_sum);
+
+                    while ($mostrar_sum = mysqli_fetch_array($result_sum)) {
+                    ?>
+                        <div class="total-summary text-center">
+                            <h5 class="mb-2">Suma Total</h5>
+                            <div class="total-value"><?php echo "$" . $mostrar_sum[0] ?></div>
+                        </div>
+                    <?php
+                    }
+                    ?>
+
+                <?php
+                } else {
+                    // Si no hay registros
+                ?>
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h4>Sin registros</h4>
+                        <p class="text-muted">No hay materiales en la cotización actual</p>
+                        <button type="button" class="btn btn-custom-primary" data-bs-toggle="modal" data-bs-target="#Crear">
+                            <i class="fas fa-plus-circle me-1"></i> Agregar Material
+                        </button>
+                    </div>
+                <?php
+                }
+                ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <?php
+    include('ModalNueva_Cotizacion.php');
+    include('ModalCrear.php');
+    include('ModalCrear-Varios.php');
+    ?>
+
+    <!-- Edit and Delete Modals -->
+    <?php
+    if (isset($result) && mysqli_num_rows($result) > 0) {
+        mysqli_data_seek($result, 0);
+        while ($mostrar = mysqli_fetch_array($result)) {
+            include('ModalEditar.php');
+            include('ModalDelete.php');
+        }
+    }
+    ?>
+
+    <!-- JavaScript for material inputs -->
     <script>
         function addMaterialInput() {
             const container = document.getElementById('materials-container');
             const newMaterialInput = document.createElement('div');
             newMaterialInput.classList.add('material-input');
             newMaterialInput.innerHTML = `
-            <input type="text" class="form-control" name="material[]" placeholder="Nombre del Material" required>
-                            <input type="number" class="form-control" name="valor_uni[]"
-                                placeholder="Valor Uni." required oninput="calculateTotal(this)">
-                            <input type="number" class="form-control" name="cantidad[]" placeholder="Cantidad" required
-                                oninput="calculateTotal(this)">
-                            <input type="number" class="form-control" name="total[]" placeholder="00" disabled>
-                            <button type="button" style="height: 38px;line-height: normal;" class="btn btn-danger"
-                                onclick="removeMaterialInput(this)">Eliminar</button>
+                <input type="text" class="form-control" name="material[]" placeholder="Nombre del Material" required>
+                <input type="number" class="form-control" name="valor_uni[]" placeholder="Valor Uni." required oninput="calculateTotal(this)">
+                <input type="number" class="form-control" name="cantidad[]" placeholder="Cantidad" required oninput="calculateTotal(this)">
+                <input type="number" class="form-control" name="total[]" placeholder="00" disabled>
+                <button type="button" class="btn btn-danger" onclick="removeMaterialInput(this)">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
             `;
             container.appendChild(newMaterialInput);
         }
@@ -50,128 +353,10 @@ $fecha_actual = date('Y-m-d');
 
             totalInput.value = total;
         }
-
-        // Modal functions
-        function openModal() {
-            document.getElementById('myModal').style.display = "block";
-        }
-
-        function closeModal() {
-            document.getElementById('myModal').style.display = "none";
-        }
-
-        // Close the modal when clicking outside of the modal
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('myModal')) {
-                closeModal();
-            }
-        }
     </script>
 
-    <title>Aplicacion Cotizacion</title>
-</head>
-
-
-<body>
-    <div class="col-sm text-center">
-        <!--- Formulario para registrar Cliente --->
-
-        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#Nueva_Cotizacion">
-            Nueva Cotizacion
-        </button>
-
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#Crear">
-            Nuevo Material
-        </button>
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#Crear2">
-            Nuevo Materiales
-        </button>
-
-        <a href="factura.php" target="_blank" class="btn btn-danger ocultar"><b>PDF</b> </a>
-
-        <a href="base_pdf.php" target="_blank" class="btn btn-danger mostrar"><b>PDF</b> </a>
-
-    </div>
-    <?php
-    include('ModalCrear.php');
-    include('ModalNueva_Cotizacion.php');
-    include('ModalCrear-Varios.php');
-    ?>
-
-<div class="main-container">
-    <?php
-    $sql = "SELECT * FROM `cotizar`;";
-    $result = mysqli_query($conexion, $sql);
-
-    // Verificar si hay registros
-    if (mysqli_num_rows($result) > 0) {
-        echo "<table>
-            <thead>
-                <tr>
-                    <th class='nombre'>Nombre</th>
-                    <th>Valor</th>
-                    <th>Cantidad</th>
-                    <th>Total</th>
-                    <th colspan='2'>Acciones</th>
-                </tr>
-            </thead>";
-
-        while ($mostrar = mysqli_fetch_array($result)) {
-            ?>
-            <tr>
-                <td class="nombre"><?php echo $mostrar['Nombre'] ?></td>
-                <td><?php echo '$' . number_format($mostrar['Valor Unitario'], 0, ',', '.'); ?></td>
-                <td><?php echo $mostrar['Cantidad'] ?></td>
-                <td><?php echo '$' . number_format($mostrar['Total'], 0, ',', '.'); ?></td>
-                <td>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editChildresn<?php echo $mostrar['ID']; ?>">
-                        Editar
-                    </button>
-
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#editChildresn1<?php echo $mostrar['ID']; ?>">
-                        Eliminar
-                    </button>
-                </td>
-            </tr>
-            <!--Ventana Modal para Actualizar--->
-            <?php include('ModalEditar.php'); ?>
-
-            <!--Ventana Modal para la Alerta de Eliminar--->
-            <?php include('ModalDelete.php'); ?>
-            <?php
-        }
-        echo "</table>";
-
-        // Mostrar la suma total
-        $sql_sum = "SELECT FORMAT(SUM(Total),0,'de_DE') FROM cotizar;";
-        $result_sum = mysqli_query($conexion, $sql_sum);
-
-        while ($mostrar_sum = mysqli_fetch_array($result_sum)) {
-            ?>
-            <br><br>
-            <div class="div1">
-                <h2><?php echo "Suma Total: $" . $mostrar_sum[0] ?> </h2>
-            </div>
-            <?php
-        }
-    } else {
-        // Si no hay registros, mostrar "Sin registros"
-        echo " <div class='div1'><h2>Sin registros</h2></div>";
-    }
-    ?>
-</div>
-
-
-    <br>
-
-    <br>
-    <br>
-
+    <!-- Bootstrap 5 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-<script src="js/jquery.min.js"></script>
-<script src="js/popper.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-
-
 
 </html>
