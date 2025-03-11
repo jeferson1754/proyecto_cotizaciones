@@ -29,16 +29,13 @@
 
           <!-- Contenedor de materiales -->
           <div id="materials-container">
-            <div class="material-input mb-3" data-index="0">
+            <div class="mb-3" data-index="0">
               <div class="row">
                 <div class="col-md-4">
                   <input type="text" class="form-control" name="material[]" placeholder="Nombre del material" required>
                 </div>
                 <div class="col-md-2">
                   <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">$</span>
-                    </div>
                     <input type="number" class="form-control valor-unitario" name="valor_uni[]" placeholder="0" min="0" required oninput="calculateTotal(this)">
                   </div>
                 </div>
@@ -79,15 +76,15 @@
           </div>
 
           <!-- Botones del formulario -->
-          <div class="form-row mt-4">
+          <div class="row mt-4">
             <div class="col-md-6">
-              <button type="button" class="btn btn-success btn-block" id="add-material-button" onclick="addMaterialInput()">
-                <i class="fas fa-plus mr-1"></i> Añadir Material
+              <button type="button" class="btn btn-success w-100" id="add-material-button">
+                <i class="fas fa-plus me-1"></i> Añadir Material
               </button>
             </div>
             <div class="col-md-6">
-              <button type="submit" class="btn btn-primary btn-block" id="create-materials-button">
-                <i class="fas fa-save mr-1"></i> Guardar Materiales
+              <button type="submit" class="btn btn-primary w-100" id="create-materials-button">
+                <i class="fas fa-save me-1"></i> Guardar Materiales
               </button>
             </div>
           </div>

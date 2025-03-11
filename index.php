@@ -355,6 +355,44 @@ $fecha_actual = date('Y-m-d');
         }
     </script>
 
+    <script>
+        // Función para formatear el número como pesos chilenos
+        function formatPesoChile(value) {
+            value = value.replace(/\D/g, ''); // Eliminar todo lo que no sea un número
+            return new Intl.NumberFormat('es-CL', {
+                style: 'currency',
+                currency: 'CLP'
+            }).format(value);
+        }
+
+        // Obtener todos los campos de entrada con la clase 'monto_gasto'
+        const montoInputs = document.querySelectorAll('.valor_formateado');
+
+        // Evento para formatear el valor mientras el usuario escribe en cada campo
+        montoInputs.forEach(function(montoInput) {
+            montoInput.addEventListener('input', function() {
+                let value = montoInput.value;
+                montoInput.value = formatPesoChile(value); // Aplicar el formato de peso chileno
+            });
+        });
+    </script>
+    <script>
+        function formatCurrency(input) {
+            // Elimina caracteres no numéricos excepto el punto decimal
+            let value = input.value.replace(/[^0-9.]/g, '');
+
+            // Si hay más de un punto decimal, elimina los adicionales
+            let parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+        }
+
+        function parseCurrency(value) {
+            return parseFloat(value.replace(/[^0-9.]/g, '')) || 0;
+        }
+    </script>
+
     <!-- Bootstrap 5 JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

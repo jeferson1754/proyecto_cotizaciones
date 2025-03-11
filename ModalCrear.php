@@ -37,19 +37,49 @@
                 <i class="fas fa-dollar-sign me-1"></i>Valor Unitario:
               </label>
               <div class="input-group">
-                <span class="input-group-text">$</span>
                 <input
-                  type="number"
-                  class="form-control form-control-lg"
+                  type="text"
+                  class="form-control form-control-lg valor_formateado"
                   id="valor"
                   name="valor"
-                  placeholder="0"
-                  min="0"
-                  step="1"
+                  placeholder="$0"
                   required
-                  oninput="calculateTotal2()">
+                  oninput="formatCurrency(this); replicateValue();">
               </div>
             </div>
+
+            <!-- Input number para replicar el valor -->
+
+            <input
+              type="number"
+              class="form-control form-control-lg"
+              id="valorNumber"
+              name="valorNumber"
+              placeholder="0"
+              min="0"
+              step="0.01"
+              style="display:none;"
+              required>
+
+
+            <script>
+              // Función para formatear el valor como moneda
+              function formatCurrency(input) {
+                let value = input.value;
+                value = value.replace(/[^\d,-]/g, ''); // Eliminar caracteres no numéricos, excepto coma y guion
+                input.value = value;
+              }
+
+              // Función para replicar el valor en el input number
+              function replicateValue() {
+                let textValue = document.getElementById("valor").value;
+                let numberValue = parseFloat(textValue.replace(/[^0-9]+/g, "")); // Elimina todo excepto números y puntos
+
+                // Asignar el valor numérico al input number
+                document.getElementById("valorNumber").value = numberValue || 0;
+              }
+            </script>
+
 
             <div class="col-md-6 mb-3">
               <label for="cantidad" class="form-label fw-bold">
@@ -63,6 +93,7 @@
                 placeholder="0"
                 min="1"
                 step="1"
+                max="1000000"
                 required
                 oninput="calculateTotal2()">
             </div>
@@ -93,32 +124,21 @@
 </div>
 
 <script>
+  // Función para calcular el total
   function calculateTotal2() {
-    const valor = parseFloat(document.getElementById('valor').value) || 0;
-    const cantidad = parseFloat(document.getElementById('cantidad').value) || 0;
-    const total = valor * cantidad;
+    // Obtiene el valor unitario, asegurándose de limpiarlo con parseCurrency
+    let valor = Math.floor(parseFloat(document.getElementById("valorNumber").value)) || 0;
+    // Asegurarse de que la cantidad sea un número entero
+    let cantidad = Math.floor(parseFloat(document.getElementById("cantidad").value)) || 0;
 
-    // Format as currency
-    const formatter = new Intl.NumberFormat('es-CL', {
+    // Calcula el total
+    let total = valor * cantidad;
+
+    // Actualiza el total en la tarjeta de Total Estimado
+    document.getElementById("totalPreview").textContent = total.toLocaleString('es-CL', {
       style: 'currency',
-      currency: 'CLP',
-      maximumFractionDigits: 0
+      currency: 'CLP'
     });
 
-    document.getElementById('totalPreview').textContent = formatter.format(total);
   }
-
-  // Initialize modal events
-  document.addEventListener('DOMContentLoaded', function() {
-    const crearModal = document.getElementById('Crear');
-    crearModal.addEventListener('shown.bs.modal', function() {
-      document.getElementById('nombre').focus();
-    });
-
-    // Reset form when modal is closed
-    crearModal.addEventListener('hidden.bs.modal', function() {
-      document.querySelector('#Crear form').reset();
-      document.getElementById('totalPreview').textContent = '$0';
-    });
-  });
 </script>

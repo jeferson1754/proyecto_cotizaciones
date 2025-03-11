@@ -3,7 +3,7 @@
 include 'bd.php';
 $idRegistros  = $_POST['id'];
 $nombre     = $_REQUEST['nombre'];
-$valor      = $_REQUEST['valor'];
+$valor = formatearMonto($_POST['valor']);
 $cantidad   = $_REQUEST['cantidad'];
 
 $total = $valor * $cantidad;
