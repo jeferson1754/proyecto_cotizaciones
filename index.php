@@ -320,6 +320,7 @@ $fecha_actual = date('Y-m-d');
 
     <!-- JavaScript for material inputs -->
     <script>
+        /*
         function addMaterialInput() {
             const container = document.getElementById('materials-container');
             const newMaterialInput = document.createElement('div');
@@ -353,6 +354,7 @@ $fecha_actual = date('Y-m-d');
 
             totalInput.value = total;
         }
+            */
     </script>
 
     <script>
