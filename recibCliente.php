@@ -26,4 +26,4 @@ try {
 }
 
 
-header("location:index.php");
+header("location:crear.php");

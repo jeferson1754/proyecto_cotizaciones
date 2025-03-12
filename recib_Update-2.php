@@ -15,4 +15,4 @@ for ($i = 0; $i < count($idRegistros); $i++) {
     echo $update . "<br>";
 }
 
-header("location:index.php");
+header("location:crear.php");

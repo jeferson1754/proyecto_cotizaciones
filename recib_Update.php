@@ -21,7 +21,7 @@ WHERE ID='" . $idRegistros . "';
 $result_update = mysqli_query($conexion, $update);
 
 
-header("location:index.php");
+header("location:crear.php");
 
 
 ?>

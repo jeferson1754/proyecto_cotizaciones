@@ -13,7 +13,7 @@ if ($resultado->num_rows > 0) {
 
         // Agregar la cotización al array
         $datos[] = [
-            "id" => $fila["Id"],
+            "id" => $fila["ID"],
             "cliente" => $fila["Nombre"],
             "fecha" => $fila["Fecha_Cotizacion"],
             "monto" => (float) $fila["Total_General"]

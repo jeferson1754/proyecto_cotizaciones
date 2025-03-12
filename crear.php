@@ -3,6 +3,16 @@
 require 'bd.php';
 date_default_timezone_set('America/Santiago');
 $fecha_actual = date('Y-m-d');
+
+
+$sql_sum = "SELECT SUM(Total) FROM cotizar;";
+$result_sum = mysqli_query($conexion, $sql_sum);
+
+while ($mostrar_sum = mysqli_fetch_array($result_sum)) {
+    $suma_total = $mostrar_sum[0];
+}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -262,20 +272,11 @@ $fecha_actual = date('Y-m-d');
                         </table>
                     </div>
 
-                    <?php
-                    $sql_sum = "SELECT FORMAT(SUM(Total),0,'de_DE') FROM cotizar;";
-                    $result_sum = mysqli_query($conexion, $sql_sum);
-
-                    while ($mostrar_sum = mysqli_fetch_array($result_sum)) {
-                    ?>
-                        <div class="total-summary text-center">
-                            <h5 class="mb-2">Suma Total</h5>
-                            <div class="total-value"><?php echo "$" . $mostrar_sum[0] ?></div>
+                    <div class="total-summary text-center">
+                        <h5 class="mb-2">Suma Total</h5>
+                        <div class="total-value">$<?php echo number_format($suma_total, 0, ',', '.'); ?>
                         </div>
-                    <?php
-                    }
-                    ?>
-
+                    </div>
                 <?php
                 } else {
                 ?>

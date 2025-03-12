@@ -11,5 +11,5 @@ $result_update = mysqli_query($conexion, $update);
 
 echo $update;
 
-header("location:index.php");
+header("location:crear.php");
 ?>

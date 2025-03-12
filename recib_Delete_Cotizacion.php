@@ -5,6 +5,7 @@ date_default_timezone_set('America/Santiago');
 $fecha_actual = date('Y-m-d H:i:s');
 
 $nombre_cliente = $_REQUEST['nombre_cliente'];
+$total = $_REQUEST['total'];
 
 if (isset($_POST['Nueva'])) {
     $delete = ("DELETE FROM cotizar");
@@ -26,6 +27,20 @@ if (isset($_POST['Nueva'])) {
     } else {
         $id_cliente = $nombres['ID'];
     }
+
+    try {
+        $sql = "INSERT INTO `cotizacion_clientes` (`ID_Cliente`, `Fecha_Cotizacion`, `Total_General`) VALUES (?, ?, ?)";
+        $stmt = $conexion->prepare($sql);
+        $stmt->bind_param("isi", $id_cliente, $fecha_actual, $total);
+        $stmt->execute();
+
+        // Obtener el ID insertado
+        $id_cotizacion = $stmt->insert_id;
+    } catch (mysqli_sql_exception $e) {
+        echo "Error: " . $e->getMessage() . "<br>";
+    }
+
+
     $sql = "SELECT * FROM `cotizar`";
     $consulta = $conexion->prepare($sql);
     $consulta->execute();
@@ -40,9 +55,9 @@ if (isset($_POST['Nueva'])) {
         $dato5 = $fecha_actual;
 
         try {
-            $sql = "INSERT INTO `cotizar_antiguos` (`ID_Cliente`, `Nombre`, `Valor Unitario`, `Cantidad`, `Total`, `Fecha_Cotizacion`) VALUES (?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO `cotizar_antiguos` (`ID_Cotizacion`, `Nombre`, `Valor Unitario`, `Cantidad`, `Total`) VALUES (?, ?, ?, ?, ?)";
             $stmt = $conexion->prepare($sql);
-            $stmt->bind_param("issiis", $id_cliente, $dato1, $dato2, $dato3, $dato4, $dato5);
+            $stmt->bind_param("isiii", $id_cotizacion, $dato1, $dato2, $dato3, $dato4);
             $stmt->execute();
             echo "<br>";
         } catch (mysqli_sql_exception $e) {
@@ -58,5 +73,5 @@ if (isset($_POST['Nueva'])) {
 }
 
 
-header("location:index.php");
+header("location:crear.php");
 ?>

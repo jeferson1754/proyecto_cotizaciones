@@ -10,6 +10,8 @@
       </div>
 
       <form name="form-data" action="recib_Delete_Cotizacion.php" method="POST">
+
+        <input type="hidden" name="total" value="<?php echo $suma_total ?>">
         <div class="modal-body">
           <div class="text-center mb-4">
             <div class="alert alert-warning">
