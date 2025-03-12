@@ -19,3 +19,10 @@ function formatearMonto($monto)
 
     return $monto;
 }
+
+try {
+    $connect = new PDO("mysql:host={$servidor};dbname={$basededatos}", $usuario, $password);
+    $connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $exception) {
+    die("Connection error: " . $exception->getMessage());
+}

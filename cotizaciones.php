@@ -13,25 +13,30 @@ $company_web = "www.suempresa.cl";
 $company_tax_id = "RUT: 12.345.678-9";
 
 // Get invoice number (you can implement this based on your system)
-$invoice_number = "COT-" . date('Ymd') . "-001";
+$invoice_number = "FC-" . date('Ymd') . "-001";
 
+$id_cotizacion = isset($_GET['id']) ? urldecode($_GET['id']) : null;
 $cotizacion = null;
 $error = null;
 
-try {
-    // Consulta SQL para obtener los datos de la tarjeta por ID
-    $stmt = $connect->prepare("SELECT * FROM `cotizar` ORDER BY `cotizar`.`ID` ASC ");
-    //$stmt->bindParam(':id', $id_cotizacion);
-    $stmt->execute();
+if ($id_cotizacion) {
+    try {
+        // Consulta SQL para obtener los datos de la tarjeta por ID
+        $stmt = $connect->prepare("SELECT * FROM `cotizar` ORDER BY `cotizar`.`ID` ASC ");
+        //$stmt->bindParam(':id', $id_cotizacion);
+        $stmt->execute();
 
-    // Verifica si hay resultados
-    if ($stmt->rowCount() > 0) {
-        $cotizacion = $stmt->fetch(PDO::FETCH_ASSOC);
-    } else {
-        $error = "No se encontró la cotizacion con el ID proporcionado.";
+        // Verifica si hay resultados
+        if ($stmt->rowCount() > 0) {
+            $cotizacion = $stmt->fetch(PDO::FETCH_ASSOC);
+        } else {
+            $error = "No se encontró la cotizacion con el ID proporcionado.";
+        }
+    } catch (PDOException $e) {
+        $error = "Error al conectar con la base de datos: " . $e->getMessage();
     }
-} catch (PDOException $e) {
-    $error = "Error al conectar con la base de datos: " . $e->getMessage();
+} else {
+    $error = "Se requiere un ID de cotizacion válido.";
 }
 
 // Fecha de emisión formateada
@@ -268,7 +273,7 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                 </div>
             <?php endif; ?>
 
-            <?php if ($cotizacion): ?>
+            <?php if ($cotizacion):?>
 
                 <div class="invoice-container" id="preview-design">
                     <!-- Header -->
@@ -404,7 +409,7 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                     </div>
 
                     <div class="text-center mb-4">
-                        <a href="./crear.php" class="btn btn-outline-secondary">
+                        <a href="gestion.php" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-1"></i> Atrás
                         </a>
                     </div>

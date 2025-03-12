@@ -1,402 +1,323 @@
 <?php
 
 require 'bd.php';
-date_default_timezone_set('America/Santiago');
-$fecha_actual = date('Y-m-d');
+
+// Consulta SQL para obtener las cotizaciones
+$sql = "SELECT cotizacion_clientes.*, clientes_cotizacion.Nombre FROM `cotizacion_clientes` INNER JOIN clientes_cotizacion ON clientes_cotizacion.ID = cotizacion_clientes.ID_Cliente;";
+$resultado = $conexion->query($sql);
+
+$datos = [];
+
+if ($resultado->num_rows > 0) {
+    while ($fila = $resultado->fetch_assoc()) {
+
+        // Agregar la cotización al array
+        $datos[] = [
+            "id" => $fila["Id"],
+            "cliente" => $fila["Nombre"],
+            "fecha" => $fila["Fecha_Cotizacion"],
+            "monto" => (float) $fila["Total_General"]
+        ];
+    }
+}
+
+// Cerrar conexión
+$conexion->close();
+
+json_encode($datos, JSON_PRETTY_PRINT);
 ?>
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Cotizaciones</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-    <!-- SweetAlert2 -->
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Custom CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3a0ca3;
-            --warning-color: #f9c74f;
-            --danger-color: #e63946;
-            --success-color: #2a9d8f;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
         }
 
         body {
-            background-color: #f5f7fb;
+            background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .navbar {
-            background-color: var(--primary-color);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            color: white;
-        }
-
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
-            margin-bottom: 1.5rem;
-            border: none;
-        }
-
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-            font-weight: 600;
-            padding: 1rem 1.5rem;
-        }
-
-        .action-buttons {
-            margin-bottom: 1.5rem;
-        }
-
-        .btn-custom-primary {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-
-        .btn-custom-primary:hover {
-            background-color: var(--secondary-color);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .btn-custom-warning {
-            background-color: var(--warning-color);
-            color: var(--dark-color);
-            border: none;
-        }
-
-        .btn-custom-warning:hover {
-            background-color: #e9b949;
-            transform: translateY(-2px);
-        }
-
-        .btn-custom-danger {
-            background-color: var(--danger-color);
-            color: white;
-            border: none;
-        }
-
-        .btn-custom-danger:hover {
-            background-color: #d62828;
-            transform: translateY(-2px);
-        }
-
-        .table {
-            background: white;
+        .cotizacion-card {
+            position: relative;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .table thead {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .table th {
-            font-weight: 600;
-            padding: 1rem;
-        }
-
-        .table td {
-            padding: 0.75rem 1rem;
-            vertical-align: middle;
-        }
-
-        .table tr:nth-child(even) {
-            background-color: rgba(67, 97, 238, 0.05);
-        }
-
-        .total-summary {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
             background-color: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
-            margin-top: 1.5rem;
+            cursor: pointer;
         }
 
-        .total-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary-color);
+        .cotizacion-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
 
-        .material-input {
-            display: grid;
-            grid-template-columns: 3fr 1fr 1fr 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-
-        @media (max-width: 992px) {
-            .material-input {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .modal-content {
-            border-radius: 12px;
-            border: none;
-        }
-
-        .modal-header {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        .cotizacion-id {
+            position: absolute;
+            top: 10px;
+            right: 10px;
             background-color: var(--primary-color);
             color: white;
-            border-radius: 12px 12px 0 0;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            z-index: 10;
         }
 
-        .modal-footer {
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        .cotizacion-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .cotizacion-details {
+            padding: 15px;
+        }
+
+        .cotizacion-cliente {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        .cotizacion-fecha {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .cotizacion-monto {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .page-title {
+            color: var(--secondary-color);
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .filtro-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .ver-mas {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .cotizacion-card:hover .ver-mas {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .cotizacion-image {
+                height: 150px;
+            }
+
+            .cotizacion-details {
+                padding: 10px;
+            }
+
+            .cotizacion-cliente {
+                font-size: 1rem;
+            }
+
+            .cotizacion-monto {
+                font-size: 1.2rem;
+            }
+
+            .ver-mas {
+                opacity: 1;
+                position: static;
+                display: block;
+                text-align: center;
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-calculator me-2"></i>Sistema de Cotizaciones
-            </a>
-        </div>
-    </nav>
+    <div class="container py-4">
+        <h1 class="page-title text-center mb-5">
+            <i class="fas fa-file-invoice-dollar me-2"></i>Sistema de Cotizaciones
+        </h1>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Action Buttons -->
-        <div class="card action-buttons">
-            <div class="card-body d-flex flex-wrap gap-2">
-                <button type="button" class="btn btn-custom-warning" data-bs-toggle="modal" data-bs-target="#Nueva_Cotizacion">
-                    <i class="fas fa-plus-circle me-1"></i> Nueva Cotización
-                </button>
-                <button type="button" class="btn btn-custom-primary" data-bs-toggle="modal" data-bs-target="#Crear">
-                    <i class="fas fa-cube me-1"></i> Nuevo Material
-                </button>
-                <button type="button" class="btn btn-custom-primary" data-bs-toggle="modal" data-bs-target="#Crear2">
-                    <i class="fas fa-cubes me-1"></i> Nuevos Materiales
-                </button>
-                <a href="base_pdf.php" target="_blank" class="btn btn-custom-danger mostrar">
-                    <i class="fas fa-file-pdf me-1"></i> Visualizar Cotizacion
-                </a>
-                <a href="factura.php" target="_blank" class="btn btn-custom-danger ocultar">
-                    <i class="fas fa-file-pdf me-1"></i> PDF
-                </a>
-
-            </div>
-        </div>
-
-        <!-- Materials Table -->
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Lista de Materiales</h5>
-                <div class="input-group" style="max-width: 300px;">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Buscar material...">
-                    <button class="btn btn-custom-primary" type="button">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <?php
-                $sql = "SELECT * FROM `cotizar`;";
-                $result = mysqli_query($conexion, $sql);
-
-                // Verificar si hay registros
-                if (mysqli_num_rows($result) > 0) {
-                ?>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Valor Unitario</th>
-                                    <th>Cantidad</th>
-                                    <th>Total</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                function formatCurrency($value)
-                                {
-                                    return '$' . number_format($value, 0, ',', '.');
-                                }
-
-                                while ($mostrar = mysqli_fetch_array($result)) {
-                                ?>
-                                    <tr>
-                                        <td class="nombre"><?php echo $mostrar['Nombre'] ?></td>
-                                        <td><?= formatCurrency($mostrar['Valor Unitario']) ?></td>
-                                        <td><?= htmlspecialchars($mostrar['Cantidad']) ?></td>
-                                        <td><?= formatCurrency($mostrar['Total']) ?></td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editChildresn<?php echo $mostrar['ID']; ?>">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#editChildresn1<?php echo $mostrar['ID']; ?>">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                <?php
-                                }
-                                ?>
-                            </tbody>
-                        </table>
+        <div class="filtro-container mb-4">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" id="buscar" class="form-control" placeholder="Buscar cliente...">
                     </div>
-
-                    <?php
-                    // Mostrar la suma total
-                    $sql_sum = "SELECT FORMAT(SUM(Total),0,'de_DE') FROM cotizar;";
-                    $result_sum = mysqli_query($conexion, $sql_sum);
-
-                    while ($mostrar_sum = mysqli_fetch_array($result_sum)) {
-                    ?>
-                        <div class="total-summary text-center">
-                            <h5 class="mb-2">Suma Total</h5>
-                            <div class="total-value"><?php echo "$" . $mostrar_sum[0] ?></div>
-                        </div>
-                    <?php
-                    }
-                    ?>
-
-                <?php
-                } else {
-                    // Si no hay registros
-                ?>
-                    <div class="text-center py-5">
-                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                        <h4>Sin registros</h4>
-                        <p class="text-muted">No hay materiales en la cotización actual</p>
-                        <button type="button" class="btn btn-custom-primary" data-bs-toggle="modal" data-bs-target="#Crear">
-                            <i class="fas fa-plus-circle me-1"></i> Agregar Material
+                </div>
+                <div class="col-md-3 mb-3 mb-md-0">
+                    <select id="ordenar" class="form-select">
+                        <option value="reciente">Más reciente</option>
+                        <option value="antiguo">Más antiguo</option>
+                        <option value="monto-alto">Mayor monto</option>
+                        <option value="monto-bajo">Menor monto</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <div class="d-flex justify-content-md-end">
+                        <button id="btn-nueva-cotizacion" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nueva Cotización
                         </button>
                     </div>
-                <?php
-                }
-                ?>
+                </div>
             </div>
+        </div>
+
+        <div class="row g-4" id="cotizaciones-grid">
+            <!-- Las cotizaciones se generarán dinámicamente aquí -->
         </div>
     </div>
 
-    <!-- Modals -->
-    <?php
-    include('ModalNueva_Cotizacion.php');
-    include('ModalCrear.php');
-    include('ModalCrear-Varios.php');
-    ?>
-
-    <!-- Edit and Delete Modals -->
-    <?php
-    if (isset($result) && mysqli_num_rows($result) > 0) {
-        mysqli_data_seek($result, 0);
-        while ($mostrar = mysqli_fetch_array($result)) {
-            include('ModalEditar.php');
-            include('ModalDelete.php');
-        }
-    }
-    ?>
-
-    <!-- JavaScript for material inputs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
-        /*
-        function addMaterialInput() {
-            const container = document.getElementById('materials-container');
-            const newMaterialInput = document.createElement('div');
-            newMaterialInput.classList.add('material-input');
-            newMaterialInput.innerHTML = `
-                <input type="text" class="form-control" name="material[]" placeholder="Nombre del Material" required>
-                <input type="number" class="form-control" name="valor_uni[]" placeholder="Valor Uni." required oninput="calculateTotal(this)">
-                <input type="number" class="form-control" name="cantidad[]" placeholder="Cantidad" required oninput="calculateTotal(this)">
-                <input type="number" class="form-control" name="total[]" placeholder="00" disabled>
-                <button type="button" class="btn btn-danger" onclick="removeMaterialInput(this)">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
+        // Obtener cotizaciones desde PHP y asegurarse de que sean interpretadas correctamente en JavaScript
+        const cotizaciones = <?php echo json_encode($datos, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>;
+
+        // Verificar si hay cotizaciones o si se recibió un mensaje en lugar de un array
+        if (Array.isArray(cotizaciones) && cotizaciones.length > 0) {
+            mostrarCotizaciones(cotizaciones);
+        } else {
+            document.getElementById('cotizaciones-grid').innerHTML = `
+                <div class="alert alert-warning text-center">
+                    ${cotizaciones.mensaje ?? "No hay cotizaciones disponibles en este momento."}
+                </div>
             `;
-            container.appendChild(newMaterialInput);
         }
 
-        function removeMaterialInput(button) {
-            const materialInput = button.parentElement;
-            materialInput.remove();
+        // Función para formatear la fecha
+        function formatearFecha(fecha) {
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            return new Date(fecha).toLocaleDateString('es-CL', options);
         }
 
-        function calculateTotal(element) {
-            const materialInput = element.parentElement;
-            const valorUniInput = materialInput.querySelector('input[name="valor_uni[]"]');
-            const cantidadInput = materialInput.querySelector('input[name="cantidad[]"]');
-            const totalInput = materialInput.querySelector('input[name="total[]"]');
-
-            const valorUni = parseFloat(valorUniInput.value) || 0;
-            const cantidad = parseFloat(cantidadInput.value) || 0;
-            const total = valorUni * cantidad;
-
-            totalInput.value = total;
-        }
-            */
-    </script>
-
-    <script>
-        // Función para formatear el número como pesos chilenos
-        function formatPesoChile(value) {
-            value = value.replace(/\D/g, ''); // Eliminar todo lo que no sea un número
+        // Función para formatear el monto
+        function formatearMonto(monto) {
             return new Intl.NumberFormat('es-CL', {
                 style: 'currency',
                 currency: 'CLP'
-            }).format(value);
+            }).format(monto);
         }
 
-        // Obtener todos los campos de entrada con la clase 'monto_gasto'
-        const montoInputs = document.querySelectorAll('.valor_formateado');
+        // Función para generar el HTML de cada cotización
+        function generarCotizacionHTML(cotizacion) {
+            return `
+                <div class="col-md-6 col-lg-4 cotizacion-item">
+                    <div class="cotizacion-card" onclick="irADetalleCotizacion('${cotizacion.id}')">
+                        <span class="cotizacion-id">COT-${cotizacion.id}</span>
+                        <div class="cotizacion-details">
+                            <div class="cotizacion-cliente">${cotizacion.cliente}</div>
+                            <div class="cotizacion-fecha">${formatearFecha(cotizacion.fecha)}</div>
+                            <div class="cotizacion-monto">${formatearMonto(cotizacion.monto)}</div>
+                            <div class="ver-mas">Ver detalles <i class="fas fa-arrow-right ms-1"></i></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
 
-        // Evento para formatear el valor mientras el usuario escribe en cada campo
-        montoInputs.forEach(function(montoInput) {
-            montoInput.addEventListener('input', function() {
-                let value = montoInput.value;
-                montoInput.value = formatPesoChile(value); // Aplicar el formato de peso chileno
-            });
-        });
-    </script>
-    <script>
-        function formatCurrency(input) {
-            // Elimina caracteres no numéricos excepto el punto decimal
-            let value = input.value.replace(/[^0-9.]/g, '');
+        // Función para mostrar las cotizaciones
+        function mostrarCotizaciones(cotizacionesArr) {
+            const gridContainer = document.getElementById('cotizaciones-grid');
+            gridContainer.innerHTML = '';
 
-            // Si hay más de un punto decimal, elimina los adicionales
-            let parts = value.split('.');
-            if (parts.length > 2) {
-                value = parts[0] + '.' + parts.slice(1).join('');
+            if (cotizacionesArr.length === 0) {
+                gridContainer.innerHTML = '<div class="col-12 text-center py-5"><h3>No se encontraron cotizaciones</h3></div>';
+                return;
             }
+
+            cotizacionesArr.forEach(cotizacion => {
+                gridContainer.innerHTML += generarCotizacionHTML(cotizacion);
+            });
         }
 
-        function parseCurrency(value) {
-            return parseFloat(value.replace(/[^0-9.]/g, '')) || 0;
+        // Función para buscar cotizaciones
+        function buscarCotizaciones() {
+            const textoBusqueda = document.getElementById('buscar').value.toLowerCase();
+            const cotizacionesFiltradas = cotizaciones.filter(cotizacion =>
+                cotizacion.cliente.toLowerCase().includes(textoBusqueda) ||
+                cotizacion.id.toLowerCase().includes(textoBusqueda)
+            );
+            mostrarCotizaciones(cotizacionesFiltradas);
         }
+
+        // Función para ordenar cotizaciones
+        function ordenarCotizaciones() {
+            const criterio = document.getElementById('ordenar').value;
+            let cotizacionesOrdenadas = [...cotizaciones];
+
+            switch (criterio) {
+                case 'reciente':
+                    cotizacionesOrdenadas.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+                    break;
+                case 'antiguo':
+                    cotizacionesOrdenadas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+                    break;
+                case 'monto-alto':
+                    cotizacionesOrdenadas.sort((a, b) => b.monto - a.monto);
+                    break;
+                case 'monto-bajo':
+                    cotizacionesOrdenadas.sort((a, b) => a.monto - b.monto);
+                    break;
+            }
+
+            mostrarCotizaciones(cotizacionesOrdenadas);
+        }
+
+        // Función para ir a la página de detalle de cotización
+        function irADetalleCotizacion(idCotizacion) {
+            // En una aplicación real, aquí redirigirías a la página de detalle
+            window.location.href = `detalle-cotizacion.php?id=${idCotizacion}`;
+
+
+        }
+
+        // Event listeners
+        document.getElementById('buscar').addEventListener('input', buscarCotizaciones);
+        document.getElementById('ordenar').addEventListener('change', ordenarCotizaciones);
+        document.getElementById('btn-nueva-cotizacion').addEventListener('click', () => {
+            window.location.href = `crear.php`;
+        });
+
     </script>
-
-    <!-- Bootstrap 5 JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
