@@ -283,7 +283,7 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                             <p><?php echo $company_tax_id; ?></p>
                         </div>
                         <div class="invoice-title">
-                            <h2>FACTURA</h2>
+                            <h2>COTIZACION</h2>
                             <p class="invoice-number"><?php echo $invoice_number; ?></p>
                         </div>
                     </div>
