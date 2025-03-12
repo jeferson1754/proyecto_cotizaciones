@@ -3,7 +3,7 @@
 require 'bd.php';
 
 // Consulta SQL para obtener las cotizaciones
-$sql = "SELECT cotizacion_clientes.*, clientes_cotizacion.Nombre FROM `cotizacion_clientes` INNER JOIN clientes_cotizacion ON clientes_cotizacion.ID = cotizacion_clientes.ID_Cliente;";
+$sql = "SELECT cotizacion_clientes.*, clientes_cotizacion.Nombre FROM `cotizacion_clientes` INNER JOIN clientes_cotizacion ON clientes_cotizacion.ID = cotizacion_clientes.ID_Cliente ORDER BY `cotizacion_clientes`.`Fecha_Cotizacion` DESC;";
 $resultado = $conexion->query($sql);
 
 $datos = [];

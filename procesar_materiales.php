@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 echo "<li>Material: $material, Valor Unitario: $valorUnitario, Cantidad: $cantidad, Total: $total</li>";
 
-                header("location:index.php");
+                header("location:crear.php");
             }
         } catch (PDOException $e) {
             echo "<h1>Error al guardar los materiales: " . $e->getMessage() . "</h1>";
