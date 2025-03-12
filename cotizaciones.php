@@ -1,8 +1,6 @@
 <?php
 include('bd.php');
 
-$day = date("d/m/Y");
-
 // Company information - you can modify this
 $company_name = "Su Empresa";
 $company_address = "Dirección de la Empresa #123";
@@ -10,20 +8,26 @@ $company_city = "Santiago, Chile";
 $company_phone = "+56 9 1234 5678";
 $company_email = "contacto@suempresa.cl";
 $company_web = "www.suempresa.cl";
-$company_tax_id = "RUT: 12.345.678-9";
+$company_tax_id = "12.345.678-9";
+$company_bank = " Banco de Chile";
+$company_num_count = "123-456-789";
+
+$iva_porcentaje = 19;
 
 // Get invoice number (you can implement this based on your system)
-$invoice_number = "FC-" . date('Ymd') . "-001";
 
 $id_cotizacion = isset($_GET['id']) ? urldecode($_GET['id']) : null;
 $cotizacion = null;
 $error = null;
 
+$invoice_number = "CT-" . str_pad($id_cotizacion, 4, "0", STR_PAD_LEFT);
+
 if ($id_cotizacion) {
     try {
         // Consulta SQL para obtener los datos de la tarjeta por ID
-        $stmt = $connect->prepare("SELECT * FROM `cotizar` ORDER BY `cotizar`.`ID` ASC ");
-        //$stmt->bindParam(':id', $id_cotizacion);
+        $stmt = $connect->prepare("SELECT cotizacion_clientes.*, clientes_cotizacion.Nombre FROM `cotizacion_clientes`
+        INNER JOIN clientes_cotizacion ON clientes_cotizacion.ID = cotizacion_clientes.ID_Cliente WHERE cotizacion_clientes.ID=:id");
+        $stmt->bindParam(':id', $id_cotizacion);
         $stmt->execute();
 
         // Verifica si hay resultados
@@ -40,7 +44,13 @@ if ($id_cotizacion) {
 }
 
 // Fecha de emisión formateada
-$fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($cotizacion['Fecha_Emision'])) : date("d/m/Y");
+$fechaEmision = isset($cotizacion['Fecha_Cotizacion']) ? date("d/m/Y", strtotime($cotizacion['Fecha_Cotizacion'])) : date("d/m/Y");
+$total = $cotizacion['Total_General'];
+
+$client_name = !empty($cotizacion['Nombre']) ? $cotizacion['Nombre'] : 'Nombre del Cliente';
+$client_rut = "RUT: XX.XXX.XXX-X";
+$client_address = "Dirección del Cliente";
+
 ?>
 
 <!DOCTYPE html>
@@ -273,7 +283,7 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                 </div>
             <?php endif; ?>
 
-            <?php if ($cotizacion):?>
+            <?php if ($cotizacion): ?>
 
                 <div class="invoice-container" id="preview-design">
                     <!-- Header -->
@@ -285,7 +295,7 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                             <p><?php echo $company_tax_id; ?></p>
                         </div>
                         <div class="invoice-title">
-                            <h2>FACTURA</h2>
+                            <h2>COTIZACION </h2>
                             <p class="invoice-number"><?php echo $invoice_number; ?></p>
                         </div>
                     </div>
@@ -294,7 +304,7 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                     <div class="invoice-details">
                         <div class="invoice-details-group">
                             <h3>Fecha</h3>
-                            <p><strong><?php echo $day; ?></strong></p>
+                            <p><strong><?php echo $fechaEmision; ?></strong></p>
                         </div>
                         <div class="invoice-details-group">
                             <h3>Contacto</h3>
@@ -304,12 +314,6 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                         </div>
                         <div class="invoice-details-group">
                             <h3>Cliente</h3>
-                            <?php
-                            // If you have client information, you can add it here
-                            $client_name = "Nombre del Cliente";
-                            $client_address = "Dirección del Cliente";
-                            $client_rut = "RUT: XX.XXX.XXX-X";
-                            ?>
                             <p><strong><?php echo $client_name; ?></strong></p>
                             <p><?php echo $client_address; ?></p>
                             <p><?php echo $client_rut; ?></p>
@@ -331,7 +335,7 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                             </thead>
                             <tbody>
                                 <?php
-                                $sql = "SELECT * FROM `cotizar` ORDER BY `cotizar`.`ID` ASC ";
+                                $sql = "SELECT * FROM `cotizar_antiguos` WHERE ID_Cotizacion=$id_cotizacion";
                                 $result = mysqli_query($conexion, $sql);
                                 $i = 1;
 
@@ -355,11 +359,8 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                                     $i++;
                                 }
 
-                                $sql = ("SELECT SUM(Total) AS total FROM cotizar");
-                                $result = mysqli_query($conexion, $sql);
-                                $total = mysqli_fetch_assoc($result)['total'];
-                                $subtotal = $total * 0.81; // Subtotal (excluding 19% VAT)
-                                $iva = $total * 0.19; // VAT (19%)
+                                $subtotal = $total * (1 - $iva_porcentaje / 100); // Subtotal (excluyendo el IVA del 19%)
+                                $iva = $total * ($iva_porcentaje / 100); // IVA (19%)
                                 ?>
                             </tbody>
                             <tfoot>
@@ -368,7 +369,7 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                                     <td class="text-right">$ <?php echo number_format($subtotal, 0, ',', '.'); ?></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="4" class="text-right">IVA (19%):</td>
+                                    <td colspan="4" class="text-right">IVA (<?php echo $iva_porcentaje ?>%):</td>
                                     <td class="text-right">$ <?php echo number_format($iva, 0, ',', '.'); ?></td>
                                 </tr>
                                 <tr>
@@ -381,8 +382,8 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                         <!-- Payment Info -->
                         <div class="payment-info">
                             <h4>Información de Pago</h4>
-                            <p>Banco: Banco de Chile</p>
-                            <p>Cuenta Corriente: 123-456-789</p>
+                            <p>Banco: <?php echo $company_bank; ?></p>
+                            <p>Cuenta Corriente: <?php echo $company_num_count; ?></p>
                             <p>Titular: <?php echo $company_name; ?></p>
                             <p>RUT: <?php echo $company_tax_id; ?></p>
                             <p>Correo: <?php echo $company_email; ?></p>
@@ -409,7 +410,7 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                     </div>
 
                     <div class="text-center mb-4">
-                        <a href="gestion.php" class="btn btn-outline-secondary">
+                        <a href="./" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-1"></i> Atrás
                         </a>
                     </div>

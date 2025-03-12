@@ -10,7 +10,10 @@ $company_city = "Santiago, Chile";
 $company_phone = "+56 9 1234 5678";
 $company_email = "contacto@suempresa.cl";
 $company_web = "www.suempresa.cl";
-$company_tax_id = "RUT: 12.345.678-9";
+$company_tax_id = "12.345.678-9";
+$company_bank = " Banco de Chile";
+$company_num_count = "123-456-789";
+
 
 // Get invoice number (you can implement this based on your system)
 $invoice_number = "COT-" . date('Ymd') . "-001";
@@ -28,7 +31,7 @@ try {
     if ($stmt->rowCount() > 0) {
         $cotizacion = $stmt->fetch(PDO::FETCH_ASSOC);
     } else {
-        $error = "No se encontró la cotizacion con el ID proporcionado.";
+        $error = "No hay elementos en la cotizacion actual.";
     }
 } catch (PDOException $e) {
     $error = "Error al conectar con la base de datos: " . $e->getMessage();
@@ -262,8 +265,8 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                     <i class="fas fa-exclamation-circle me-2"></i><?php echo htmlspecialchars($error); ?>
                 </div>
                 <div class="text-center mt-4">
-                    <a href="index.php" class="btn btn-primary">
-                        <i class="fas fa-home me-2"></i>Volver al inicio
+                    <a href="./crear.php" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-1"></i>Atrás
                     </a>
                 </div>
             <?php endif; ?>
@@ -376,8 +379,8 @@ $fechaEmision = isset($cotizacion['Fecha_Emision']) ? date("d/m/Y", strtotime($c
                         <!-- Payment Info -->
                         <div class="payment-info">
                             <h4>Información de Pago</h4>
-                            <p>Banco: Banco de Chile</p>
-                            <p>Cuenta Corriente: 123-456-789</p>
+                            <p>Banco: <?php echo $company_bank; ?></p>
+                            <p>Cuenta Corriente: <?php echo $company_num_count; ?></p>
                             <p>Titular: <?php echo $company_name; ?></p>
                             <p>RUT: <?php echo $company_tax_id; ?></p>
                             <p>Correo: <?php echo $company_email; ?></p>

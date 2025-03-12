@@ -3,7 +3,7 @@
 require 'bd.php';
 
 // Consulta SQL para obtener las cotizaciones
-$sql = "SELECT cotizacion_clientes.*, clientes_cotizacion.Nombre FROM `cotizacion_clientes` INNER JOIN clientes_cotizacion ON clientes_cotizacion.ID = cotizacion_clientes.ID_Cliente ORDER BY `cotizacion_clientes`.`Fecha_Cotizacion` DESC;";
+$sql = "SELECT cotizacion_clientes.*, clientes_cotizacion.Nombre FROM `cotizacion_clientes` INNER JOIN clientes_cotizacion ON clientes_cotizacion.ID = cotizacion_clientes.ID_Cliente ORDER BY `cotizacion_clientes`.`Fecha_Cotizacion`DESC, `cotizacion_clientes`.`ID` DESC;";
 $resultado = $conexion->query($sql);
 
 $datos = [];
@@ -305,7 +305,7 @@ json_encode($datos, JSON_PRETTY_PRINT);
         // Función para ir a la página de detalle de cotización
         function irADetalleCotizacion(idCotizacion) {
             // En una aplicación real, aquí redirigirías a la página de detalle
-            window.location.href = `detalle-cotizacion.php?id=${idCotizacion}`;
+            window.location.href = `cotizaciones.php?id=${idCotizacion}`;
 
 
         }

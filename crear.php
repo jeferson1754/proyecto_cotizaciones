@@ -209,7 +209,7 @@ while ($mostrar_sum = mysqli_fetch_array($result_sum)) {
                 <button type="button" class="btn btn-custom-primary" data-bs-toggle="modal" data-bs-target="#Crear2">
                     <i class="fas fa-cubes me-1"></i> Nuevos Materiales
                 </button>
-                <a href="base_pdf.php" target="_blank" class="btn btn-custom-danger mostrar">
+                <a href="base_pdf.php" class="btn btn-custom-danger mostrar">
                     <i class="fas fa-file-pdf me-1"></i> Visualizar Cotizacion
                 </a>
 
