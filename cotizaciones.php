@@ -250,6 +250,76 @@ $client_address = "Dirección del Cliente";
             font-size: 14px;
         }
 
+        @media (max-width: 768px) {
+            .invoice-header {
+                flex-direction: column;
+                text-align: left;
+            }
+
+            .invoice-title {
+                order: -1;
+                /* Mueve la cotización arriba */
+            }
+
+            .company-info {
+                text-align: left;
+            }
+
+            .invoice-number {
+                text-align: left;
+            }
+
+            .invoice-details {
+                flex-direction: column;
+                text-align: left;
+
+            }
+
+            .invoice-details-group {
+                margin-bottom: 10px;
+            }
+
+            .invoice-details-group h3 {
+                font-weight: 800;
+            }
+
+            .invoice-items h3 {
+                text-align: center;
+            }
+
+            .items-table thead {
+                display: none;
+                /* Oculta los encabezados */
+            }
+
+            .items-table tr {
+                display: block;
+                margin-bottom: 10px;
+                border: 1px solid #ddd;
+                padding: 10px;
+            }
+
+            .items-table td {
+                display: block;
+                text-align: right;
+                position: relative;
+                padding-left: 50%;
+            }
+
+            .items-table td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                font-weight: bold;
+                text-align: left;
+            }
+
+            .total {
+                font-weight: 600;
+            }
+
+        }
+
         @media print {
             body {
                 background-color: white;
@@ -349,11 +419,11 @@ $client_address = "Dirección del Cliente";
                                     }
                                 ?>
                                     <tr>
-                                        <td><?php echo $i; ?></td>
-                                        <td class="item-name"><?php echo $nombre; ?></td>
-                                        <td><?php echo $cantidad; ?></td>
-                                        <td class="text-right">$ <?php echo number_format($mostrar['Valor Unitario'], 0, ',', '.'); ?></td>
-                                        <td class="text-right">$ <?php echo number_format($mostrar['Total'], 0, ',', '.'); ?></td>
+                                        <td data-label="#"> <?php echo $i; ?> </td>
+                                        <td data-label="Descripción" class="item-name"><?php echo $nombre; ?></td>
+                                        <td data-label="Cantidad"><?php echo $cantidad; ?></td>
+                                        <td data-label="P. Unitario" class="text-right">$ <?php echo number_format($mostrar['Valor Unitario'], 0, ',', '.'); ?></td>
+                                        <td data-label="Total" class="text-right total">$ <?php echo number_format($mostrar['Total'], 0, ',', '.'); ?></td>
                                     </tr>
                                 <?php
                                     $i++;

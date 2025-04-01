@@ -158,9 +158,110 @@ while ($mostrar_sum = mysqli_fetch_array($result_sum)) {
             align-items: center;
         }
 
+        .mostrar-celu {
+            display: none;
+        }
+
+
         @media (max-width: 992px) {
             .material-input {
                 grid-template-columns: 1fr;
+            }
+
+            .action-buttons .card-body {
+                flex-direction: column;
+                /* Alineación vertical en móvil */
+                align-items: center;
+                /* Centrar botones */
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+                /* Ocupar todo el ancho disponible */
+                text-align: center;
+            }
+
+
+            .mostrar-celu {
+                display: flex;
+            }
+
+            .ocultar {
+                display: none !important;
+            }
+
+            .table-responsive {
+                overflow-x: auto;
+                /* Permite desplazamiento horizontal */
+                -webkit-overflow-scrolling: touch;
+                /* Suaviza el desplazamiento en móviles */
+            }
+
+            table.table {
+                width: 100%;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            thead {
+                display: none;
+                /* Ocultar encabezado en móvil */
+            }
+
+            tbody,
+            tr,
+            td {
+                display: block;
+                width: 100%;
+            }
+
+            tr {
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                padding: 10px;
+                background: #fff;
+            }
+
+            td {
+                text-align: center;
+                padding: 8px;
+                position: relative;
+            }
+
+            td:before {
+                content: attr(data-label);
+                font-weight: bold;
+                display: block;
+                margin-bottom: 5px;
+                color: #333;
+            }
+
+            td:last-child {
+                text-align: center;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start !important;
+                text-align: left;
+            }
+
+            .input-group {
+                width: 100% !important;
+                /* Hace que la barra de búsqueda ocupe todo el ancho */
+                margin-top: 10px;
+            }
+
+            .col-md-2 {
+                margin-top: 10px;
+            }
+
+            .col-md-2 .btn {
+                width: 100%;
+                /* Ocupar todo el ancho disponible */
+                text-align: center;
             }
         }
 
@@ -252,17 +353,30 @@ while ($mostrar_sum = mysqli_fetch_array($result_sum)) {
                                 while ($mostrar = mysqli_fetch_array($result)) {
                                 ?>
                                     <tr>
-                                        <td class="nombre"><?php echo htmlspecialchars($mostrar['Nombre']); ?></td>
-                                        <td><?= formatCurrency($mostrar['Valor Unitario']) ?></td>
-                                        <td><?= htmlspecialchars($mostrar['Cantidad']) ?></td>
-                                        <td><?= formatCurrency($mostrar['Total']) ?></td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editChildresn<?php echo $mostrar['ID']; ?>">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#editChildresn1<?php echo $mostrar['ID']; ?>">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
+                                        <td data-label="Nombre" class="nombre"><?= htmlspecialchars($mostrar['Nombre']); ?></td>
+                                        <td data-label="Valor Unitario"><?= formatCurrency($mostrar['Valor Unitario']); ?></td>
+                                        <td data-label="Cantidad"><?= htmlspecialchars($mostrar['Cantidad']); ?></td>
+                                        <td data-label="Total"><?= formatCurrency($mostrar['Total']); ?></td>
+                                        <td data-label="Acciones" class="action-buttons">
+
+                                            <div class="mostrar-celu card-body flex-wrap gap-2">
+                                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editChildresn<?php echo $mostrar['ID']; ?>">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#editChildresn1<?php echo $mostrar['ID']; ?>">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+
+                                            <div class="ocultar">
+                                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editChildresn<?php echo $mostrar['ID']; ?>">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#editChildresn1<?php echo $mostrar['ID']; ?>">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+
                                         </td>
                                     </tr>
                                 <?php

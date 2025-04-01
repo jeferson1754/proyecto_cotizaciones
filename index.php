@@ -162,6 +162,10 @@ json_encode($datos, JSON_PRETTY_PRINT);
                 text-align: center;
                 margin-top: 10px;
             }
+
+            #btn-nueva-cotizacion {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -316,7 +320,6 @@ json_encode($datos, JSON_PRETTY_PRINT);
         document.getElementById('btn-nueva-cotizacion').addEventListener('click', () => {
             window.location.href = `crear.php`;
         });
-
     </script>
 </body>
 

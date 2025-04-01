@@ -19,7 +19,7 @@
 
         <form id="create-materials-form" action="procesar_materiales.php" method="post">
           <!-- Encabezados de la tabla -->
-          <div class="row mb-2 font-weight-bold">
+          <div class="row mb-2 font-weight-bold ocultar">
             <div class="col-md-4">Nombre del Material</div>
             <div class="col-md-2">Valor Unitario</div>
             <div class="col-md-2">Cantidad</div>
